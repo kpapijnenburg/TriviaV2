@@ -7,18 +7,31 @@ import application.model.User;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
+
 public class UserSqlContext implements IUserContext {
+
+    private static final Logger LOGGER = Logger.getLogger(UserSqlContext.class.getName());
+
+
+    String dbPassword = "wachtwoord";
+
     @Override
-    public ArrayList<User> getAll() {
+    public ArrayList<User> getAll() throws SQLException {
+
+        Connection connection = null;
+
         ArrayList<User> users = new ArrayList<>();
 
         try {
             //Set up connection
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", "wachtwoord");
+            connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", dbPassword);
             Statement statement = connection.createStatement();
             String query = "SELECT * FROM Trivia.[User]";
 
@@ -37,26 +50,28 @@ public class UserSqlContext implements IUserContext {
             // Close connections
             result.close();
             statement.close();
-            connection.close();
 
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.FINEST, e.toString());
+        } finally {
+            connection.close();
         }
 
         return users;
     }
 
     @Override
-    public boolean create(User user) {
+    public boolean create(User user) throws SQLException {
 
         boolean result = false;
+        Connection connection = null;
 
         String encryptedPassword = new BCryptPasswordEncoder(11).encode(user.getPassword());
 
         try {
             //Set up connection
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", "wachtwoord");
+            connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", dbPassword);
             PreparedStatement statement = connection.prepareStatement(
                     "INSERT INTO Trivia.[User]" +
                             " VALUES (?, ?)"
@@ -69,7 +84,10 @@ public class UserSqlContext implements IUserContext {
 
 
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.FINEST, e.toString());
+        }
+        finally {
+            connection.close();
         }
 
         return result;
@@ -84,7 +102,7 @@ public class UserSqlContext implements IUserContext {
         try {
             //Set up connection
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", "wachtwoord");
+            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", dbPassword);
             PreparedStatement statement = connection.prepareStatement(
             "SELECT * FROM Trivia.[User] WHERE [Name] = ?"
             );
@@ -113,7 +131,7 @@ public class UserSqlContext implements IUserContext {
             connection.close();
 
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.FINEST, e.toString());
         }
 
         if (user != null) {

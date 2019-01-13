@@ -1,17 +1,26 @@
 package api.game;
 
+import api.User.UserSqlContext;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GameSqlContext implements IGameContext {
+
+    private static final Logger LOGGER = Logger.getLogger(GameSqlContext.class.getName());
+
+    private String dbPassword = "wachtwoord";
+
     @Override
     public void saveSinglePlayerGame(int score, int userId) {
         try {
             //Set up connection
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", "wachtwoord");
+            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", dbPassword);
             PreparedStatement statement = connection.prepareStatement(
                     "INSERT INTO Trivia.SingleplayerGame" +
                             " VALUES (?, ?)"
@@ -24,7 +33,7 @@ public class GameSqlContext implements IGameContext {
 
 
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.FINEST, e.toString());
         }
 
     }
@@ -34,7 +43,7 @@ public class GameSqlContext implements IGameContext {
         try {
             //Set up connection
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", "wachtwoord");
+            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", dbPassword);
             PreparedStatement statement = connection.prepareStatement(
                     "INSERT INTO Trivia.MultiplayerGame" +
                             " VALUES (?, ?,?,?,?)"
@@ -50,7 +59,7 @@ public class GameSqlContext implements IGameContext {
 
 
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.FINEST, e.toString());
         }
     }
 }

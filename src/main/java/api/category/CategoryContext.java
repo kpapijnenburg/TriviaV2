@@ -1,12 +1,20 @@
 package api.category;
 
+import api.game.GameSqlContext;
 import application.model.Category;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CategoryContext implements ICategoryContext {
+
+    private String dbPassword = "wachtwoord";
+    private static final Logger LOGGER = Logger.getLogger(CategoryContext.class.getName());
+
     @Override
     public List<Category> getAll() {
         List<Category> categories = new ArrayList<>();
@@ -14,7 +22,7 @@ public class CategoryContext implements ICategoryContext {
         try {
             //Set up connection
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", "wachtwoord");
+            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", dbPassword);
             Statement statement = connection.createStatement();
             String query = "SELECT * FROM Trivia.Category";
 
@@ -36,7 +44,7 @@ public class CategoryContext implements ICategoryContext {
 
 
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.FINEST, e.toString());
         }
 
         return categories;

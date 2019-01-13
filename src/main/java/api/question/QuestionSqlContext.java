@@ -1,5 +1,6 @@
 package api.question;
 
+import api.User.UserSqlContext;
 import application.model.Answer;
 import application.model.Question;
 
@@ -7,8 +8,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class QuestionSqlContext implements IQuestionContext {
+
+    private String dbPassword = "wachtwoord";
+
+    private static final Logger LOGGER = Logger.getLogger(QuestionSqlContext.class.getName());
+
+
     @Override
     public List<Question> getQuestions(int categoryId, String difficulty) {
         ArrayList<Question> questions = new ArrayList<>();
@@ -16,7 +25,7 @@ public class QuestionSqlContext implements IQuestionContext {
         try {
             //Set up connection
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", "wachtwoord");
+            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", dbPassword);
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT TOP 3 * FROM Trivia.Question WHERE Trivia.Question.Categoryid = ? AND Trivia.Question.difficulty = ? ORDER BY NEWID()"
             );
@@ -45,7 +54,7 @@ public class QuestionSqlContext implements IQuestionContext {
             connection.close();
 
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.FINEST, e.toString());
         }
 
 //        connectAnswers(questions);
@@ -55,7 +64,7 @@ public class QuestionSqlContext implements IQuestionContext {
 
     private ArrayList<Answer> connectAnswers(int id) throws ClassNotFoundException, SQLException {
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", "wachtwoord");
+        Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", dbPassword);
 
         ArrayList<Answer> answers = new ArrayList<>();
 
@@ -86,7 +95,7 @@ public class QuestionSqlContext implements IQuestionContext {
             connection.close();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.FINEST, e.toString());
         }
 
         return answers;
@@ -99,7 +108,7 @@ public class QuestionSqlContext implements IQuestionContext {
         try {
 
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", "wachtwoord");
+            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", dbPassword);
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT * FROM Trivia.Answer WHERE Trivia.Answer.Questionid = ? AND Trivia.Answer.IsCorrect = 1"
             );
@@ -124,7 +133,7 @@ public class QuestionSqlContext implements IQuestionContext {
             connection.close();
 
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.FINEST, e.toString());
         }
 
         return answer;
@@ -137,7 +146,7 @@ public class QuestionSqlContext implements IQuestionContext {
         try {
             //Set up connection
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", "wachtwoord");
+            Connection connection = DriverManager.getConnection("jdbc:sqlserver://mssql.fhict.local;database=dbi388613", "dbi388613", dbPassword);
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT TOP 1 * FROM Trivia.Question WHERE Trivia.Question.Categoryid = ? AND Trivia.Question.difficulty = ? ORDER BY NEWID()"
             );
@@ -166,7 +175,7 @@ public class QuestionSqlContext implements IQuestionContext {
             connection.close();
 
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.FINEST, e.toString());
         }
 
 
